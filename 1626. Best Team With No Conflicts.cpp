@@ -64,46 +64,40 @@ void _print(T t, V... v) {
 class Solution {
 public:
     int dp[1005][1005];
-	int helper(vector<pair<int, int>> &a, int i, pair<int, int> curr) {
+	int helper(vector<pair<int, int>> &a, int i, int prev) {
 
-		
 		if (i >= sz(a)) {
 			return 0;
 		}
         
-        if(dp[i][curr.f1] != -1){
-            return dp[i][curr.f1];
+        if(dp[i][prev+1] != -1){
+            return dp[i][prev+1];
         }
-		int op1 = 0;
-
-        if (a[i].f1 > curr.f1 && a[i].s2 >= curr.s2) {
-			op1 = a[i].s2 + helper(a, i + 1, {max(curr.f1, a[i].f1),max(curr.s2, a[i].s2)});
-
-		}
         
-		int op2 = helper(a, i + 1, {0,0});
-
-
-		return dp[i][curr.f1] = max(op1, op2);
-
+        int op1 = 0;
+        
+        
+        
+        if(prev == -1 || a[prev].s2 <= a[i].s2){
+            op1 = a[i].s2 + helper(a,i+1,i);
+        }
+            
+        int op2 = helper(a,i+1,prev);
+        
+        return dp[i][prev+1] = max(op1,op2);
 	}
 
 	int bestTeamScore(vector<int>& scores, vector<int>& ages) {
 
-		// mx_age and score of curr Team members
-		pair<int, int> curr = {0, 0};
         memset(dp,-1,sizeof(dp));
         
 		vector<pair<int, int>> a;
-        
-        map<int,int> g;
-        rep(i,0,sz(scores)){
-            g[ages[i]] += scores[i];
-        }
-        for(auto x:g){
-           a.pb({x.f1,x.s2}); 
-        }
-        watch(a);
-		return helper(a, 0, curr);
+
+		rep(i, 0, sz(scores)) {
+			a.pb({ages[i], scores[i]});
+		}
+		sort(all(a));
+
+		return helper(a, 0, -1);
 	}
 };
